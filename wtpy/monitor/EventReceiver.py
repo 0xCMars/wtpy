@@ -85,8 +85,8 @@ class EventReceiver(WtMQClient):
             elif topic == TOPIC_RT_MARKET:
                 msgObj = json.loads(message)
                 print(msgObj)
-                trader = msgObj['trader']
-                self._sink.on_market_move(trader, msgObj["message"])
+                code = msgObj['code']
+                self._sink.on_market_move(code, msgObj["message"])
             elif topic == TOPIC_RT_LOG:
                 msgObj = json.loads(message)
                 self._sink.on_log(msgObj["tag"], msgObj["time"], msgObj["message"])
