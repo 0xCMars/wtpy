@@ -146,7 +146,7 @@ class PushServer:
     def notifyGrpChnlEvt(self, groupid, chnlid, evttype, data):
         if not self.ready:
             return
-
+        print("notifyGrpChnlEvt:" + data)
         self.mutex.acquire()
         self.messages.append({"type":"chnlevt", "groupid":groupid, "channel":chnlid, "data":data, "evttype":evttype})
         self.mutex.release()
