@@ -2507,6 +2507,9 @@ class WtMonSvr(WatcherSink):
     def on_notify(self, grpid: str, chnl: str, message: str):
         self.push_svr.notifyGrpChnlEvt(grpid, chnl, 'notify', message)
 
+    def on_market_move(self, grpid: str, chnl: str, message:str):
+        self.push_svr.notifyGrpChnlEvt(grpid, chnl, 'market_move', message)
+
     def on_timeout(self, grpid: str):
         if not self.notifyTimeout:
             return

@@ -6,6 +6,7 @@ from wtpy import WtMsgQue, WtMQClient
 TOPIC_RT_TRADE = "TRD_TRADE"    # 生产环境下的成交通知
 TOPIC_RT_ORDER = "TRD_ORDER"    # 生产环境下的订单通知
 TOPIC_RT_NOTIFY = "TRD_NOTIFY"  # 生产环境下的普通通知
+TOPIC_RT_MARKET = "TRD_MARKET"  # 生产环境下的KBars通知
 TOPIC_RT_LOG = "LOG"            # 生产环境下的日志通知
 TOPIC_TIMEOUT = "TIMEOUT"       # 消息超时通知
 
@@ -22,6 +23,9 @@ class EventSink:
     def on_notify(self, chnl:str, message:str):
         pass
 
+    def on_market_move(self, chnl:str, message:str):
+        pass
+    
     def on_log(self, tag:str, time:int, message:str):
         pass
 
@@ -75,6 +79,11 @@ class EventReceiver(WtMQClient):
                 msgObj = json.loads(message)
                 trader = msgObj["trader"]
                 self._sink.on_notify(trader, msgObj["message"])
+            elif topic == TOPIC_RT_MARKET:
+                msgObj = json.loads(message)
+                print(msgObj)
+                trader = msgObj['trader']
+                self._sink.on_market_move(trader, msgObj["message"])
             elif topic == TOPIC_RT_LOG:
                 msgObj = json.loads(message)
                 self._sink.on_log(msgObj["tag"], msgObj["time"], msgObj["message"])

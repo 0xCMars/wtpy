@@ -345,6 +345,11 @@ class AppInfo(EventSink):
         if self._sink is not None:
             self._sink.on_notify(self._id, chnl, message)
 
+    # EventSink.on_market_move
+    def on_market_move(self, chnl:str, message:str):
+        if self._sink is not None:
+            self._sink.on_market_move(self._id, chnl, message)
+
     # EventSink.on_log
     def on_log(self, tag:str, time:int, message:str):
         if self._sink is not None:
