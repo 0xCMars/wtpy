@@ -28,12 +28,13 @@ class WtMQWrapper:
 
         self._cb_log = CB_ON_LOG(self.on_mq_log)
         self.api.regiter_callbacks(self._cb_log)
-
+        print("WtMQWrapper init cb log")
         self.api.create_server.argtypes = [c_char_p, c_bool]
         self.api.create_server.restype = c_ulong
 
     def on_mq_log(self, id:int, message:str, bServer:bool):
         message = bytes.decode(message)
+        print("on_mq_log")
         if self._logger is not None:
             self._logger.info(message)
         print(message)
