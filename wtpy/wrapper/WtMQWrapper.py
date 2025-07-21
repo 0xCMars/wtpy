@@ -36,8 +36,7 @@ class WtMQWrapper:
         message = bytes.decode(message)
         if self._logger is not None:
             self._logger.info(message)
-        else:
-            print(message)
+        print(message)
 
     def create_server(self, url:str):
         return self.api.create_server(bytes(url, 'utf-8'), True)
