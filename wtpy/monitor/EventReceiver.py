@@ -50,7 +50,10 @@ class EventReceiver(WtMQClient):
         self.logger = logger
         mq = WtMsgQue(logger)
         mq.add_mq_client(url, self)
+        print("EventReceiver init")
+
         for topic in topics:
+            print("subscribe" + topic)
             self.subscribe(topic)
 
         self._stopped = False
