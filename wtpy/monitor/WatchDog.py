@@ -347,6 +347,7 @@ class AppInfo(EventSink):
 
     # EventSink.on_market_move
     def on_market_move(self, chnl:str, message:str):
+        print(chnl)
         if self._sink is not None:
             self._sink.on_market_move(self._id, chnl, message)
 
