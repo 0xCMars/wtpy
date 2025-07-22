@@ -48,8 +48,8 @@ class EventReceiver(WtMQClient):
     def __init__(self, url:str, topics:list = [], sink:EventSink = None, logger = None):
         self.url = url
         self.logger = logger
-        mq = WtMsgQue(logger)
-        mq.add_mq_client(url, self)
+        self.mq = WtMsgQue(logger)
+        self.mq.add_mq_client(url, self)
         print("EventReceiver init")
 
         for topic in topics:
@@ -97,7 +97,7 @@ class EventReceiver(WtMQClient):
         self.start()
 
     def release(self):
-        mq.destroy_mq_client(self)
+        self.mq.destroy_mq_client(self)
 
 TOPIC_BT_EVENT  = "BT_EVENT"    # 回测环境下的事件，主要通知回测的启动和结束
 TOPIC_BT_STATE  = "BT_STATE"    # 回测的状态
