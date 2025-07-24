@@ -2464,7 +2464,7 @@ class WtMonSvr(WatcherSink):
     def __run_impl__(self, port: int, host: str):
         self._dog.run()
         self.push_svr.run()
-        uvicorn.run(self.app, port=port, host=host, log_level="error")
+        uvicorn.run(self.app, port=port, host=host, log_level="info")
 
     def run(self, port: int = 8080, host="0.0.0.0", bSync: bool = True):
         # 仅linux生效，在linux中，子进程会一直等待父进程处理其结束信号才能释放，如果不加这一句忽略子进程的结束信号，子进程就无法结束
@@ -2508,7 +2508,7 @@ class WtMonSvr(WatcherSink):
         self.push_svr.notifyGrpChnlEvt(grpid, chnl, 'notify', message)
 
     def on_market_move(self, grpid: str, chnl: str, message:str):
-        self.push_svr.notifyGrpChnlEvt(grpid, chnl, 'market_move', message)
+        self.push_svr.notifyGrpMarket(grpid, chnl, 'market_move', message)
 
     def on_timeout(self, grpid: str):
         if not self.notifyTimeout:

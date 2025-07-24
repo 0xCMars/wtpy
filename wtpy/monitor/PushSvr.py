@@ -26,21 +26,24 @@ class PushServer:
     async def connect(self, ws: WebSocket):
         # 等待连接
         await ws.accept()
-
+        print("ws accept")
         if "tokeninfo" in ws.session:
             tInfo = ws.session["tokeninfo"]
             if tInfo is not None:
                 self.logger.info(f"{tInfo['loginid']} connected")
             # 存储ws连接对象
+            print("add ws" + tInfo['loginid'])
             self.active_connections.append(ws)
 
     def disconnect(self, ws: WebSocket):
         # 关闭时 移除ws对象
-        self.active_connections.remove(ws)
+        print(ws)
         if "tokeninfo" in ws.session:
             tInfo = ws.session["tokeninfo"]
             if tInfo is not None:
                 self.logger.info(f"{tInfo['loginid']} disconnected")
+        self.active_connections.remove(ws)
+
 
     @staticmethod
     async def send_personal_message(data: dict, ws: WebSocket):
@@ -65,6 +68,7 @@ class PushServer:
         for ws in self.active_connections:
             if len(groupid)!=0 and "groupid" in ws.session and ws.session["groupid"]!=groupid:
                 continue
+            # print("asyncio.ensure_future(ws.send_json(data))")
             tasks.append(asyncio.ensure_future(ws.send_json(data)))
         
         if len(tasks) > 0:            
@@ -85,9 +89,13 @@ class PushServer:
         self.logger.info("{}@{} subscribed group {}".format(tokenInfo["loginid"], tokenInfo["loginip"] , data["groupid"]))
 
     def run(self):
+        print("push svr run")
         app = self.app
         @app.websocket("/")
         async def ws_listen(ws:WebSocket):
+            print("try to connect")
+            print("ws.scope.keys():", ws.scope.keys())
+            print("session:", ws.scope.get("session"))
             await self.connect(ws)
             try:
                 while True:
@@ -97,6 +105,7 @@ class PushServer:
                         tp = req["type"]
                         if tp == 'subscribe':
                             self.on_subscribe_group(ws,req)
+                            print("self.send_personal_message(req, ws)" + ws)
                             await self.send_personal_message(req, ws)
                         elif tp == 'heartbeat':
                             await self.send_personal_message({"type":"heartbeat", "message":"pong"}, ws)
@@ -104,6 +113,7 @@ class PushServer:
                         continue
 
             except WebSocketDisconnect:
+                print("WebSocketDisconnect")
                 self.disconnect(ws)
         self.ready = True
 
@@ -115,7 +125,6 @@ class PushServer:
             if len(self.messages) == 0:
                 time.sleep(1)
                 continue
-            
             self.mutex.acquire()
             messages = self.messages.copy()
             self.messages = []
@@ -144,11 +153,16 @@ class PushServer:
         self.mutex.release()
 
     def notifyGrpChnlEvt(self, groupid, chnlid, evttype, data):
-        print("PushServer:notifyGrpChnlEvt")
         if not self.ready:
             return
 
         self.mutex.acquire()
         self.messages.append({"type":"chnlevt", "groupid":groupid, "channel":chnlid, "data":data, "evttype":evttype})
         self.mutex.release()
-        print("PushServer:notifyGrpChnlEvt end.")
+    
+    def notifyGrpMarket(self, groupid, chnlid, evttype, data):
+        if not self.ready:
+            return
+        self.mutex.acquire()
+        self.messages.append({"type":"market", "groupid":groupid, "channel":chnlid, "data":data, "evttype":evttype})
+        self.mutex.release()

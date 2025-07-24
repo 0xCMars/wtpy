@@ -66,7 +66,7 @@ class EventReceiver(WtMQClient):
             message = decode_bytes(message[:dataLen])
         else:
             message = None
-        print("EventReceiver:on_mq_message" + topic)
+        # print("EventReceiver:on_mq_message" + topic)
 
         if self._sink is not None:
             if topic == TOPIC_RT_TRADE:
@@ -85,7 +85,7 @@ class EventReceiver(WtMQClient):
                 self._sink.on_notify(trader, msgObj["message"])
             elif topic == TOPIC_RT_MARKET:
                 msgObj = json.loads(message)
-                print(msgObj)
+                # print(msgObj)
                 code = msgObj['code']
                 self._sink.on_market_move(code, msgObj["price"])
             elif topic == TOPIC_RT_LOG:
